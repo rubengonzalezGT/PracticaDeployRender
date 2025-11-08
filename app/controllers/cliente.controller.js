@@ -1,12 +1,12 @@
-// importamos db los modelos en este caso si tenemos uno o mas, se puede referenciar db."nombreModelo".   
+// importamos db los modelos en este caso si tenemos uno o mas, se puede referenciar db."estudianteModelo".   
 const db = require("../models");
 const Cliente = db.clientes;
 const Op = db.Sequelize.Op;
 
 // Create and Save a new Client
 exports.create = (req, res) => {
-    // Validamos que dentro del  request no venga vacio el nombre, de lo contrario returna error
-    if (!req.body.nombre) {
+    // Validamos que dentro del  request no venga vacio el estudiante, de lo contrario returna error
+    if (!req.body.estudiante) {
         res.status(400).send({
             message: "Content can not be empty!"
         });
@@ -15,14 +15,15 @@ exports.create = (req, res) => {
 
     // Create a Client, definiendo una variable con la estructura del reques para luego solo ser enviada como parametro mas adelante. 
     const cliente = {
-        nombre: req.body.nombre,
-        apellido: req.body.apellido,
-        direccion: req.body.direccion, 
-        correo: req.body.correo,
-        telefono: req.body.telefono,
-        ingreso: req.body.ingreso,
+        carnet: req.body.carnet,
+        estudiante: req.body.estudiante,
+        mes: req.body.mes, 
+        semestre: req.body.semestre,
+        año: req.body.año,
+        monto: req.body.monto,
+        transaccionStripe: req.body.transaccionStripe,
         // utilizando ? nos ayuda a indicar que el paramatro puede ser opcional dado que si no viene, le podemos asignar un valor default
-        status: req.body.status ? req.body.status : false
+        statusStripe: req.body.statusStripe ? req.body.statusStripe : false
     };
 
     // Save a new Client into the database
@@ -33,15 +34,15 @@ exports.create = (req, res) => {
         .catch(err => {
             res.status(500).send({
                 message:
-                    err.message || "Some error occurred while creating the Client."
+                    err.message || "Some error occurred while creating the Estudiante."
             });
         });
 };
 
 // Retrieve all Client from the database.
 exports.findAll = (req, res) => {
-    const nombre = req.query.nombre;
-    var condition = nombre ? { nombre: { [Op.iLike]: `%${nombre}%` } } : null;
+    const estudiante = req.query.estudiante;
+    var condition = estudiante ? { estudiante: { [Op.iLike]: `%${estudiante}%` } } : null;
 
     Cliente.findAll({ where: condition })
         .then(data => {
@@ -57,25 +58,25 @@ exports.findAll = (req, res) => {
 
 // Find a single Tutorial with an id
 exports.findOne = (req, res) => {
-    const id = req.params.id;
+    const carnet = req.params.carnet;
 
-    Cliente.findByPk(id)
+    Cliente.findByPk(carnet)
         .then(data => {
             res.send(data);
         })
         .catch(err => {
             res.status(500).send({
-                message: "Error retrieving Cliente with id=" + id
+                message: "Error retrieving Cliente with carnet=" + carnet
             });
         });
 };
 
 // Update a Tutorial by the id in the request
 exports.update = (req, res) => {
-    const id = req.params.id;
+    const carnet = req.params.carnet;
 
     Cliente.update(req.body, {
-        where: { id: id }
+        where: { carnet: carnet }
     })
         .then(num => {
             if (num == 1) {
@@ -84,23 +85,23 @@ exports.update = (req, res) => {
                 });
             } else {
                 res.send({
-                    message: `Cannot update Client with id=${id}. Maybe Client was not found or req.body is empty!`
+                    message: `Cannot update Client with carnet=${carnet}. Maybe Client was not found or req.body is empty!`
                 });
             }
         })
         .catch(err => {
             res.status(500).send({
-                message: "Error updating Client with id=" + id
+                message: "Error updating Client with carnet=" + carnet
             });
         });
 };
 
-// Delete a Client with the specified id in the request
+// Delete a Client with the specified carnet in the request
 exports.delete = (req, res) => {
-    const id = req.params.id;
-    // utilizamos el metodo destroy para eliminar el objeto mandamos la condicionante where id = parametro que recibimos 
+    const carnet = req.params.carnet;
+    // utilizamos el metodo destroy para eliminar el objeto mandamos la condicionante where carnet = parametro que recibimos 
     Cliente.destroy({
-        where: { id: id }
+        where: { carnet: carnet }
     })
         .then(num => {
             if (num == 1) {
@@ -109,13 +110,13 @@ exports.delete = (req, res) => {
                 });
             } else {
                 res.send({
-                    message: `Cannot delete Client with id=${id}. El cliente no fue encontado!`
+                    message: `Cannot delete Client with carnet=${carnet}. El cliente no fue encontado!`
                 });
             }
         })
         .catch(err => {
             res.status(500).send({
-                message: "Could not delete Tutorial with id=" + id
+                message: "Could not delete Tutorial with carnet=" + carnet
             });
         });
 };
